@@ -32,7 +32,7 @@ export default function HomePage() {
   useEffect(() => {
     const timer1 = setTimeout(() => setStarsFaded(true), 500);
     const timer2 = setTimeout(() => setStarsZoomed(true), 2500);
-    const timer3 = setTimeout(() => setContentVisible(true), 4000); // Increased from 4000 to 5000
+    const timer3 = setTimeout(() => setContentVisible(true), 4000);
 
     return () => {
       clearTimeout(timer1);
@@ -79,8 +79,37 @@ export default function HomePage() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Calculate dynamic background color based on scroll progress
+  // Interpolate from black (#08090D) to white (#FFFFFF)
+  const getBackgroundColor = (progress: number) => {
+    // Convert hex colors to RGB for interpolation
+    const blackRGB = { r: 8, g: 9, b: 13 }; // #08090D
+    const whiteRGB = { r: 255, g: 255, b: 255 }; // #FFFFFF
+
+    // Interpolate between black and white
+    const factor = progress / 100; // Convert percentage to 0-1
+    const r = Math.round(blackRGB.r + (whiteRGB.r - blackRGB.r) * factor);
+    const g = Math.round(blackRGB.g + (whiteRGB.g - blackRGB.g) * factor);
+    const b = Math.round(blackRGB.b + (whiteRGB.b - blackRGB.b) * factor);
+
+    return `rgb(${r}, ${g}, ${b})`;
+  };
+
+  // Calculate dynamic text color for readability
+  // When background is light (>50%), use dark text; when dark, use light text
+  const getTextColor = (progress: number) => {
+    return progress > 50 ? "text-gray-900" : "text-white";
+  };
+
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#08090D] text-white">
+    <div
+      className={`relative min-h-screen overflow-hidden transition-colors duration-1500 ease-in-out ${getTextColor(
+        invertAmount
+      )}`}
+      style={{
+        backgroundColor: getBackgroundColor(invertAmount),
+      }}
+    >
       {/* Stars background with zoom and invert effects */}
       <div
         className={`fixed inset-0 z-0 transition-all duration-1500 ease-in-out 
@@ -112,29 +141,50 @@ export default function HomePage() {
             Hello, I&apos;m
           </h1>
           <div className="text-6xl font-bold leading-relaxed md:text-7xl lg:text-8xl">
-            <span className="gradient-glow bg-gradient-to-r from-[#4B9EF4] via-[#9B6BF7] via-[#E85EE3] to-[#F7936F] bg-clip-text text-transparent inline-block pt-0 pb-5 my-1.5">
+            <span
+              className="gradient-glow bg-gradient-to-r from-[#4B9EF4] via-[#9B6BF7] via-[#E85EE3] to-[#F7936F] bg-clip-text text-transparent inline-block pt-0 pb-5 my-1.5"
+              style={{
+                // Enhance gradient visibility on light backgrounds
+                filter:
+                  invertAmount > 50 ? "brightness(0.8) saturate(1.2)" : "none",
+              }}
+            >
               Ahoura
               <br />
               Radpey
             </span>
           </div>
           <div className="text-3xl font-light leading-relaxed md:text-4xl lg:text-5xl">
-            <TypeWriter />
+            <TypeWriter invertAmount={invertAmount} />
           </div>
           <p className="text-xl font-light leading-relaxed md:text-2xl">
             Specializing in{" "}
-            <span className="gradient-glow bg-gradient-to-r from-[#4B9EF4] via-[#9B6BF7] via-[#E85EE3] to-[#F7936F] bg-clip-text text-transparent font-medium">
+            <span
+              className="gradient-glow bg-gradient-to-r from-[#4B9EF4] via-[#9B6BF7] via-[#E85EE3] to-[#F7936F] bg-clip-text text-transparent font-medium"
+              style={{
+                // Enhance gradient visibility on light backgrounds
+                filter:
+                  invertAmount > 50 ? "brightness(0.8) saturate(1.2)" : "none",
+              }}
+            >
               Python
             </span>{" "}
             and{" "}
-            <span className="gradient-glow bg-gradient-to-r from-[#4B9EF4] via-[#9B6BF7] via-[#E85EE3] to-[#F7936F] bg-clip-text text-transparent font-medium">
+            <span
+              className="gradient-glow bg-gradient-to-r from-[#4B9EF4] via-[#9B6BF7] via-[#E85EE3] to-[#F7936F] bg-clip-text text-transparent font-medium"
+              style={{
+                // Enhance gradient visibility on light backgrounds
+                filter:
+                  invertAmount > 50 ? "brightness(0.8) saturate(1.2)" : "none",
+              }}
+            >
               TypeScript
             </span>{" "}
             development, building responsive and scalable web applications.
           </p>
         </div>
 
-        <ScrollIndicator />
+        <ScrollIndicator invertAmount={invertAmount} />
       </section>
 
       {/* Projects Section */}
@@ -158,7 +208,7 @@ export default function HomePage() {
   );
 }
 
-function TypeWriter() {
+function TypeWriter({ invertAmount }: { invertAmount: number }) {
   const [displayText, setDisplayText] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
   const [loopNum, setLoopNum] = useState(0);
@@ -202,11 +252,22 @@ function TypeWriter() {
       <span className="whitespace-nowrap leading-relaxed">
         I&apos;m a&nbsp;
       </span>
-      <span className="gradient-glow bg-gradient-to-r from-[#4B9EF4] via-[#9B6BF7] via-[#E85EE3] to-[#F7936F] bg-clip-text text-transparent inline-flex items-center">
+      <span
+        className="gradient-glow bg-gradient-to-r from-[#4B9EF4] via-[#9B6BF7] via-[#E85EE3] to-[#F7936F] bg-clip-text text-transparent inline-flex items-center"
+        style={{
+          // Enhance gradient visibility on light backgrounds
+          filter: invertAmount > 50 ? "brightness(0.8) saturate(1.2)" : "none",
+        }}
+      >
         <span className="whitespace-nowrap leading-relaxed">{displayText}</span>
         <span
           className="inline-block w-[2px] bg-[#F7936F] animate-blink"
-          style={{ height: "1em", marginLeft: "2px" }}
+          style={{
+            height: "1em",
+            marginLeft: "2px",
+            // Make cursor more visible on light backgrounds
+            backgroundColor: invertAmount > 50 ? "#8B5CF6" : "#F7936F",
+          }}
         ></span>
       </span>
     </div>
