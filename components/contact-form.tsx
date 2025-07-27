@@ -1,100 +1,123 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState, useRef, type FormEvent } from "react"
-import emailjs from "@emailjs/browser"
-import { Github, Linkedin, Mail } from "lucide-react"
-import Link from "next/link"
+import { useState, useRef, type FormEvent } from "react";
+import emailjs from "@emailjs/browser";
+import { Github, Linkedin, Mail } from "lucide-react";
+import Link from "next/link";
 
 export function ContactForm() {
-  const formRef = useRef<HTMLFormElement>(null)
+  const formRef = useRef<HTMLFormElement>(null);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     subject: "",
     message: "",
-  })
+  });
   const [errors, setErrors] = useState({
     name: "",
     email: "",
     subject: "",
     message: "",
-  })
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle")
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<
+    "idle" | "success" | "error"
+  >("idle");
 
   const validateForm = () => {
-    let valid = true
+    let valid = true;
     const newErrors = {
       name: "",
       email: "",
       subject: "",
       message: "",
-    }
+    };
 
     if (!formData.name.trim()) {
-      newErrors.name = "Name is required"
-      valid = false
+      newErrors.name = "Name is required";
+      valid = false;
     }
 
     if (!formData.email.trim()) {
-      newErrors.email = "Email is required"
-      valid = false
+      newErrors.email = "Email is required";
+      valid = false;
     } else if (!/^\S+@\S+\.\S+$/.test(formData.email)) {
-      newErrors.email = "Please enter a valid email address"
-      valid = false
+      newErrors.email = "Please enter a valid email address";
+      valid = false;
     }
 
     if (!formData.subject.trim()) {
-      newErrors.subject = "Subject is required"
-      valid = false
+      newErrors.subject = "Subject is required";
+      valid = false;
     }
 
     if (!formData.message.trim()) {
-      newErrors.message = "Message is required"
-      valid = false
+      newErrors.message = "Message is required";
+      valid = false;
     }
 
-    setErrors(newErrors)
-    return valid
-  }
+    setErrors(newErrors);
+    return valid;
+  };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
-    }))
-  }
+    }));
+  };
 
   const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    if (!validateForm()) return
+    if (!validateForm()) return;
 
-    setIsSubmitting(true)
-    setSubmitStatus("idle")
+    setIsSubmitting(true);
+    setSubmitStatus("idle");
 
     try {
-      await emailjs.sendForm("service_lfviswt", "template_tko7mxo", formRef.current!, "gyVStG2e4MyAKmDjk")
+      // Use environment variables for EmailJS configuration
+      // These are public keys that are safe to expose in client-side code
+      const serviceId = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID;
+      const templateId = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID;
+      const publicKey = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY;
 
-      setSubmitStatus("success")
-      setFormData({ name: "", email: "", subject: "", message: "" })
+      // Validate that environment variables are set
+      if (!serviceId || !templateId || !publicKey) {
+        throw new Error(
+          "EmailJS configuration is missing. Please check your environment variables."
+        );
+      }
+
+      await emailjs.sendForm(
+        serviceId,
+        templateId,
+        formRef.current!,
+        publicKey
+      );
+
+      setSubmitStatus("success");
+      setFormData({ name: "", email: "", subject: "", message: "" });
     } catch (error) {
-      console.error("Error sending email:", error)
-      setSubmitStatus("error")
+      console.error("Error sending email:", error);
+      setSubmitStatus("error");
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   return (
     <div className="w-full max-w-7xl mx-auto px-4">
       <div
         className="rounded-xl overflow-hidden"
         style={{
-          background: "linear-gradient(to right, #4B9EF4, #9B6BF7, #E85EE3, #F7936F)",
+          background:
+            "linear-gradient(to right, #4B9EF4, #9B6BF7, #E85EE3, #F7936F)",
           padding: "2px",
         }}
       >
@@ -106,7 +129,8 @@ export function ContactForm() {
                 Contact Me
               </h2>
               <p className="text-gray-300 mb-8">
-                Have questions or opportunities you&apos;d like to discuss with me? Use the form or you can reach me at{" "}
+                Have questions or opportunities you&apos;d like to discuss with
+                me? Use the form or you can reach me at{" "}
                 <a
                   href="mailto:ahouraradpey@gmail.com"
                   className="text-[#9B6BF7] hover:text-[#E85EE3] transition-colors"
@@ -116,7 +140,9 @@ export function ContactForm() {
               </p>
 
               <div className="mt-auto pt-8">
-                <h3 className="text-lg font-semibold mb-4 text-gray-200">Connect with me</h3>
+                <h3 className="text-lg font-semibold mb-4 text-gray-200">
+                  Connect with me
+                </h3>
                 <div className="flex gap-4">
                   <Link
                     href="https://github.com/aradpey"
@@ -146,11 +172,16 @@ export function ContactForm() {
 
             {/* Contact Form */}
             <div className="p-8 md:p-12 rounded-tr-[9px] rounded-br-[9px]">
-              <h2 className="text-2xl font-bold mb-8 text-gray-200">Send me a message</h2>
+              <h2 className="text-2xl font-bold mb-8 text-gray-200">
+                Send me a message
+              </h2>
               <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
-                    <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-1">
+                    <label
+                      htmlFor="name"
+                      className="block text-sm font-medium text-gray-300 mb-1"
+                    >
                       Name <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -164,11 +195,16 @@ export function ContactForm() {
                       } rounded-md focus:outline-none focus:ring-2 focus:ring-[#9B6BF7] text-white`}
                       placeholder="Your name"
                     />
-                    {errors.name && <p className="mt-1 text-sm text-red-500">{errors.name}</p>}
+                    {errors.name && (
+                      <p className="mt-1 text-sm text-red-500">{errors.name}</p>
+                    )}
                   </div>
 
                   <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1">
+                    <label
+                      htmlFor="email"
+                      className="block text-sm font-medium text-gray-300 mb-1"
+                    >
                       Email <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -182,12 +218,19 @@ export function ContactForm() {
                       } rounded-md focus:outline-none focus:ring-2 focus:ring-[#9B6BF7] text-white`}
                       placeholder="your.email@example.com"
                     />
-                    {errors.email && <p className="mt-1 text-sm text-red-500">{errors.email}</p>}
+                    {errors.email && (
+                      <p className="mt-1 text-sm text-red-500">
+                        {errors.email}
+                      </p>
+                    )}
                   </div>
                 </div>
 
                 <div>
-                  <label htmlFor="subject" className="block text-sm font-medium text-gray-300 mb-1">
+                  <label
+                    htmlFor="subject"
+                    className="block text-sm font-medium text-gray-300 mb-1"
+                  >
                     Subject <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -201,11 +244,18 @@ export function ContactForm() {
                     } rounded-md focus:outline-none focus:ring-2 focus:ring-[#9B6BF7] text-white`}
                     placeholder="What is this regarding?"
                   />
-                  {errors.subject && <p className="mt-1 text-sm text-red-500">{errors.subject}</p>}
+                  {errors.subject && (
+                    <p className="mt-1 text-sm text-red-500">
+                      {errors.subject}
+                    </p>
+                  )}
                 </div>
 
                 <div>
-                  <label htmlFor="message" className="block text-sm font-medium text-gray-300 mb-1">
+                  <label
+                    htmlFor="message"
+                    className="block text-sm font-medium text-gray-300 mb-1"
+                  >
                     Message <span className="text-red-500">*</span>
                   </label>
                   <textarea
@@ -219,7 +269,11 @@ export function ContactForm() {
                     } rounded-md focus:outline-none focus:ring-2 focus:ring-[#9B6BF7] text-white`}
                     placeholder="Your message"
                   ></textarea>
-                  {errors.message && <p className="mt-1 text-sm text-red-500">{errors.message}</p>}
+                  {errors.message && (
+                    <p className="mt-1 text-sm text-red-500">
+                      {errors.message}
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -229,7 +283,9 @@ export function ContactForm() {
                     className="w-full relative overflow-hidden rounded-md px-6 py-3 font-medium transition-all disabled:opacity-70"
                   >
                     <span className="absolute inset-0 bg-gradient-to-r from-[#4B9EF4] via-[#9B6BF7] via-[#E85EE3] to-[#F7936F]"></span>
-                    <span className="relative z-10 text-white">{isSubmitting ? "Sending..." : "Send Message"}</span>
+                    <span className="relative z-10 text-white">
+                      {isSubmitting ? "Sending..." : "Send Message"}
+                    </span>
                   </button>
                 </div>
 
@@ -250,5 +306,5 @@ export function ContactForm() {
         </div>
       </div>
     </div>
-  )
+  );
 }
