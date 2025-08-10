@@ -139,7 +139,7 @@ export function ProjectsSection() {
     {
       title: "Lumiscout",
       description:
-        "A fast, dark-themed web comic reader that pulls series, chapters, and images from the Comick API. Features search and filtering, per-chapter navigation, reading progress, and a lightweight comments system with authentication. API: Comick API (content), Supabase (auth, database, realtime) Stack: Next.js 15 (App Router, SSR), React 19, TypeScript, Tailwind CSS 4",
+        "A fast, dark-themed web comic reader that pulls series, chapters, and images from the Comick API. Features search and filtering, per-chapter navigation, reading progress, and a lightweight comments system with authentication.",
       imageUrl: "/images/projects/lumiscout.PNG",
       projectUrl: "https://lumiscout.com",
     },
