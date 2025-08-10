@@ -1,120 +1,148 @@
-"use client"
+"use client";
 
-import { useEffect, useRef, useState } from "react"
-import Link from "next/link"
-import Image from "next/image"
+import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
 
 interface ProjectProps {
-  title: string
-  description: string
-  index: number
-  imageUrl?: string
-  projectUrl?: string
+  title: string;
+  description: string;
+  index: number;
+  imageUrl?: string;
+  projectUrl?: string;
 }
 
-function Project({ title, description, index, imageUrl, projectUrl }: ProjectProps) {
-  const projectRef = useRef<HTMLDivElement>(null)
-  const [isVisible, setIsVisible] = useState(false)
+function Project({
+  title,
+  description,
+  index,
+  imageUrl,
+  projectUrl,
+}: ProjectProps) {
+  const projectRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
-          setIsVisible(true)
-          observer.disconnect()
+          setIsVisible(true);
+          observer.disconnect();
         }
       },
-      { threshold: 0.1 },
-    )
+      { threshold: 0.1 }
+    );
 
     if (projectRef.current) {
-      observer.observe(projectRef.current)
+      observer.observe(projectRef.current);
     }
 
     return () => {
       if (projectRef.current) {
-        observer.unobserve(projectRef.current)
+        observer.unobserve(projectRef.current);
       }
-    }
-  }, [])
+    };
+  }, []);
 
-  const initialTransform = index % 2 === 0 ? "-translate-x-[50px]" : "translate-x-[50px]"
+  const initialTransform =
+    index % 2 === 0 ? "-translate-x-[50px]" : "translate-x-[50px]";
 
-  const ProjectWrapper = projectUrl ? Link : "div"
-  const wrapperProps = projectUrl ? { href: projectUrl, target: "_blank", rel: "noopener noreferrer" } : {}
+  const card = (
+    <div
+      className="w-full aspect-video rounded-xl overflow-hidden relative transition-all duration-300 group-hover:scale-[1.02]"
+      style={{
+        background:
+          "linear-gradient(to right, #4B9EF4, #9B6BF7, #E85EE3, #F7936F)",
+        padding: "2px",
+      }}
+    >
+      <div className="w-full h-full rounded-[10px] bg-[#0A0C12] flex items-center justify-center overflow-hidden">
+        {imageUrl ? (
+          <Image
+            src={imageUrl || "/placeholder.svg"}
+            alt={title}
+            width={800}
+            height={450}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className="text-gray-500">Project {index + 1} Image</div>
+        )}
+      </div>
+
+      <div
+        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl"
+        style={{
+          boxShadow:
+            "0 0 15px rgba(155, 107, 247, 0.5), 0 0 15px rgba(232, 94, 227, 0.5)",
+        }}
+      ></div>
+    </div>
+  );
 
   return (
     <div
       ref={projectRef}
       className={`flex flex-col items-center transition-all duration-1000 ease-out ${
-        isVisible ? "opacity-100 translate-x-0" : `opacity-0 ${initialTransform}`
+        isVisible
+          ? "opacity-100 translate-x-0"
+          : `opacity-0 ${initialTransform}`
       }`}
     >
       <h3 className="mb-4 text-2xl font-bold bg-gradient-to-r from-[#4B9EF4] via-[#9B6BF7] via-[#E85EE3] to-[#F7936F] bg-clip-text text-transparent">
         {title}
       </h3>
-      <ProjectWrapper {...wrapperProps} className="block w-full mb-4 group">
-        <div
-          className="w-full aspect-video rounded-xl overflow-hidden relative transition-all duration-300 group-hover:scale-[1.02]"
-          style={{
-            background: "linear-gradient(to right, #4B9EF4, #9B6BF7, #E85EE3, #F7936F)",
-            padding: "2px",
-          }}
+      {projectUrl ? (
+        <Link
+          href={projectUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block w-full mb-4 group"
         >
-          <div className="w-full h-full rounded-[10px] bg-[#0A0C12] flex items-center justify-center overflow-hidden">
-            {imageUrl ? (
-              <Image
-                src={imageUrl || "/placeholder.svg"}
-                alt={title}
-                width={800}
-                height={450}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="text-gray-500">Project {index + 1} Image</div>
-            )}
-          </div>
-
-          <div
-            className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl"
-            style={{
-              boxShadow: "0 0 15px rgba(155, 107, 247, 0.5), 0 0 15px rgba(232, 94, 227, 0.5)",
-            }}
-          ></div>
-        </div>
-      </ProjectWrapper>
+          {card}
+        </Link>
+      ) : (
+        <div className="block w-full mb-4 group">{card}</div>
+      )}
       <p className="text-center text-gray-300 max-w-md">{description}</p>
     </div>
-  )
+  );
 }
 
 export function ProjectsSection() {
-  const sectionRef = useRef<HTMLDivElement>(null)
-  const [isVisible, setIsVisible] = useState(false)
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
-          setIsVisible(true)
-          observer.disconnect()
+          setIsVisible(true);
+          observer.disconnect();
         }
       },
-      { threshold: 0.1 },
-    )
+      { threshold: 0.1 }
+    );
 
     if (sectionRef.current) {
-      observer.observe(sectionRef.current)
+      observer.observe(sectionRef.current);
     }
 
     return () => {
       if (sectionRef.current) {
-        observer.unobserve(sectionRef.current)
+        observer.unobserve(sectionRef.current);
       }
-    }
-  }, [])
+    };
+  }, []);
 
   const projects = [
+    {
+      title: "Lumiscout",
+      description:
+        "A fast, dark-themed web comic reader that pulls series, chapters, and images from the Comick API. Features search and filtering, per-chapter navigation, reading progress, and a lightweight comments system with authentication. API: Comick API (content), Supabase (auth, database, realtime) Stack: Next.js 15 (App Router, SSR), React 19, TypeScript, Tailwind CSS 4",
+      imageUrl: "/images/projects/lumiscout.PNG",
+      projectUrl: "https://lumiscout.com",
+    },
     {
       title: "NBA Today's Game Tracker",
       description:
@@ -143,7 +171,7 @@ export function ProjectsSection() {
       imageUrl: "/images/projects/freebrowsertools.png",
       projectUrl: "http://freebrowsertools.dev",
     },
-  ]
+  ];
 
   return (
     <div ref={sectionRef} className="w-full max-w-6xl mx-auto px-4 py-8">
@@ -167,5 +195,5 @@ export function ProjectsSection() {
         ))}
       </div>
     </div>
-  )
+  );
 }
